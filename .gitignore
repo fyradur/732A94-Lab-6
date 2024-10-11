@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 *.Rproj
+*.org~
+Read-and-delete-me
