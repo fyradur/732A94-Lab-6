@@ -6,6 +6,9 @@
 #' @return A list detailing the maximum value and the elements to get it.
 #' @export
 #'
+#' @importFrom memoise memoise
+
+
 knapsack_dynamic <- function(x, W){
   if (!all(c('w', 'v') %in% names(x))) {
     stop("Error: Data frame 'x' must contain columns named 'w' (weights) and 'v' (values).")
@@ -41,12 +44,16 @@ knapsack_dynamic <- function(x, W){
     else if (x$w[i] <= w) {max(m(i-1, w), m(i-1, w-x$w[i]) + x$v[i])}
   }
 
+  m <- memoise::memoise(m)
+
 
   knapsack <- function(i,j){
       if (i == 0){c()}
       else if (m(i,j) > m(i-1, j)) {c(i,knapsack(i-1, j-x$w[i]))}
       else {knapsack(i-1, j)}
   }
+
+  knapsack <- memoise::memoise(knapsack)
 
   return(list(value = m(nrow(x), W), elements = knapsack(nrow(x), W)))
 }
