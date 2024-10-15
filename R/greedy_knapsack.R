@@ -1,3 +1,11 @@
+#' A heuristic solution to the knapsack problem
+#'
+#' @param x A dataframe.
+#' @param W A non-negative number.
+#'
+#' @return A list detailing the maximum value and the elements to get it.
+#' @export
+#'
 greedy_knapsack <- function(x, W){
   # Check if x has columns 'w' and 'v'
   if (!all(c('w', 'v') %in% names(x))) {

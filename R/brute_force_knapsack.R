@@ -1,3 +1,11 @@
+#' Brute force the knapsack problem
+#'
+#' @param x A dataframe.
+#' @param W A non-negative number.
+#'
+#' @return A list detailing the maximum value and the elements to get it.
+#' @export
+#'
 brute_force_knapsack <-
 function(x, W){
   # Check if x has columns 'w' and 'v'
