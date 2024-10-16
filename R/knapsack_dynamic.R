@@ -44,7 +44,7 @@ knapsack_dynamic <- function(x, W){
     else if (x$w[i] <= w) {max(m(i-1, w), m(i-1, w-x$w[i]) + x$v[i])}
   }
 
-  m <- memoise::memoise(m)
+  #m <- memoise::memoise(m)
 
 
   knapsack <- function(i,j){
@@ -53,7 +53,7 @@ knapsack_dynamic <- function(x, W){
       else {knapsack(i-1, j)}
   }
 
-  knapsack <- memoise::memoise(knapsack)
+  #knapsack <- memoise::memoise(knapsack)
 
   return(list(value = m(nrow(x), W), elements = knapsack(nrow(x), W)))
 }

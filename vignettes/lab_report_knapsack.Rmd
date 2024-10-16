@@ -1,5 +1,5 @@
 ---
-title: "Lab 6 report"
+title: "lab_report_knapsack"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{lab_report_knapsack}
@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(Khwarizmi)
 ```
-
 
 # Introduction
 
@@ -47,17 +46,14 @@ v=runif(n = n, 0, 10000)
 system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000))
 ```
 
-
 # Dynamic programming
 
 ```{r}
 system.time(bfk <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 20))
 ```
 
-
 # Greedy heuristic
 
 ```{r}
 system.time(bfk <- greedy_knapsack(x = knapsack_objects[1:1000000,], W = 2000))
 ```
-
