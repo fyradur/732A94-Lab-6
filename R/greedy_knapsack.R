@@ -30,30 +30,30 @@ greedy_knapsack <- function(x, W) {
   if (any(x$w < 0) || any(x$v < 0)) {
     stop("Columns w and v must contain non-negative numeric values.")
   }
-  
+
   # Remove NA values from the data frame for w and v
   x <- na.omit(x)
-  
+
   # Calculate value-to-weight ratio and sort items by this ratio in descending order
   x$ratio <- x$v / x$w
   items <- x[order(-x$ratio), ]
-  
+
   # Initialize total value, weight, and selected indices
   total_value <- 0
   total_weight <- 0
-  selected_indices <- integer()
-  
+  sel_ind <- integer()
+
   # Loop through the sorted items and add to the knapsack
   for (i in seq_len(nrow(items))) {
     if (total_weight + items$w[i] <= W) {
       total_weight <- total_weight + items$w[i]
       total_value <- total_value + items$v[i]
-      selected_indices <- c(selected_indices, which(x$w == items$w[i] & x$v == items$v[i]))
+      sel_ind <- c(sel_ind, which(x$w == items$w[i] & x$v == items$v[i]))
     } else {
       break
     }
   }
-  
+
   # Return the result as a list
-  list(value = round(total_value), elements = selected_indices)
+  return(list(value = round(total_value), elements = sel_ind))
 }

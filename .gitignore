@@ -4,6 +4,5 @@
 .Ruserdata
 *.Rproj
 *.org~
-Read-and-delete-me
 *~
 inst/doc

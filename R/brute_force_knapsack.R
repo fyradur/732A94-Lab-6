@@ -15,7 +15,7 @@
 #'   \item{value}{The maximum total value of the items that can be carried.}
 #'   \item{elements}{A vector of indices corresponding to the items in the optimal solution.}
 #' }
-#' 
+#'
 #' @importFrom stats na.omit
 #' @importFrom Rcpp cppFunction
 #'
@@ -31,7 +31,7 @@ brute_force_knapsack <- function(x, W, fast = FALSE) {
   if (!is.numeric(x$w) || any(x$w < 0) || !is.numeric(x$v) || any(x$v < 0)) {
     stop("Columns w and v must contain non-negative numeric values.")
   }
-  
+
   if (fast) {
     # C++ implementation using Rcpp
     Rcpp::cppFunction(
@@ -67,37 +67,37 @@ brute_force_knapsack <- function(x, W, fast = FALSE) {
       }
       '
     )
-    
+
     # Call the C++ function
     result <- knapsack_cpp(as.numeric(x$w), as.numeric(x$v), W)
     return(result)
   } else {
-    n <- nrow(x)  # Number of items
-    max_value <- 0  # Variable to track maximum value
-    best_combination <- integer(0)  # Best combination of items
-    
+    n <- nrow(x) # Number of items
+    max_value <- 0 # Variable to track maximum value
+    best_combination <- integer(0) # Best combination of items
+
     # Iterate through all possible combinations of items
     for (i in 0:(2^n - 1)) {
-      combination <- integer(0)  # Current combination of items
-      total_weight <- 0  # Weight of the current combination
-      total_value <- 0  # Value of the current combination
-      
+      combination <- integer(0) # Current combination of items
+      total_weight <- 0 # Weight of the current combination
+      total_value <- 0 # Value of the current combination
+
       for (j in 1:n) {
         # Check if the j-th item is included in the current combination
         if (bitwAnd(i, 2^(j - 1)) != 0) {
           total_weight <- total_weight + x$w[j]
           total_value <- total_value + x$v[j]
-          combination <- c(combination, j)  # Store the index of the included item
+          combination <- c(combination, j) # Store the index of the included item
         }
       }
-      
+
       # If the current combination is valid and has a higher value, update the best combination
       if (total_weight <= W && total_value > max_value) {
         max_value <- total_value
         best_combination <- combination
       }
     }
-    
+
     # Return the result
     knapsack_rezzie <- list(value = max_value, elements = best_combination)
     return(knapsack_rezzie)
