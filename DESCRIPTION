@@ -1,11 +1,15 @@
 Package: Khwarizmi
-Type: Package
-Title: What the Package Does (Short Line)
+Title: Various implementations of algorithms for solving the knapsack problem
 Version: 1.0
-Date: 2024-10-11
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line).
+Date: 2024-10-20
+Authors@R: c(
+    person("Linn", "Frisell", email = "linfr259@student.liu.se", role = "cre"),
+    person("John", "Möller", email = "johmo@student.liu.se", role = "aut"))
+Maintainer: Linn F. <linfr259@student.liu.se>
+Description: This R package offers functionality for various implementations of 
+    algorithms addressing the knapsack problem. This package is a part of the 
+    coursework for the Advanced Programming in R course  (732A94) at Linköping 
+    University.
 License: GPL-2
 Suggests: 
     knitr,
@@ -15,5 +19,7 @@ Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
+Encoding: UTF-8
 Imports:
-    memoise
+    Rcpp,
+    stats

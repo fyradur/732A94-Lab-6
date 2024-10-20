@@ -1,65 +1,59 @@
-#' A heuristic solution to the knapsack problem
+#' Greedy Approximation Knapsack Solver
 #'
-#' @param x A dataframe.
-#' @param W A non-negative number.
+#' This function solves the bounded knapsack problem using a greedy approximation algorithm.
 #'
-#' @return A list detailing the maximum value and the elements to get it.
+#' @param x A data frame with two columns:
+#'   \describe{
+#'     \item{w}{A numeric vector representing the weights of the items.}
+#'     \item{v}{A numeric vector representing the values of the items.}
+#'   }
+#' @param W A numeric value representing the maximum weight capacity of the knapsack.
+#'
+#' @return A list with two elements:
+#' \describe{
+#'   \item{value}{The maximum total value of the items that can be carried.}
+#'   \item{elements}{A vector of indices corresponding to the items selected for the optimal solution.}
+#' }
+#'
 #' @export
-#'
-greedy_knapsack <- function(x, W){
-  # Check if x has columns 'w' and 'v'
-  if (!all(c('w', 'v') %in% names(x))) {
-    stop("Error: Data frame 'x' must contain columns named 'w' (weights) and 'v' (values).")
+greedy_knapsack <- function(x, W) {
+  # Input validation
+  if (!is.data.frame(x)) {
+    stop("Input x must be a data frame.")
+  }
+  if (W < 0) {
+    stop("Input W must be non-negative.")
+  }
+  if (!all(c("w", "v") %in% names(x))) {
+    stop("Data frame x must contain columns named w and v.")
+  }
+  if (any(x$w < 0) || any(x$v < 0)) {
+    stop("Columns w and v must contain non-negative numeric values.")
   }
 
-  # Check if weights and values are numeric and non-negative
-  if (!is.numeric(x$w) || any(x$w < 0)) {
-    stop("Error: Column 'w' must contain non-negative numeric values.")
-  }
+  # Remove NA values from the data frame for w and v
+  x <- na.omit(x)
 
-  if (!is.numeric(x$v) || any(x$v < 0)) {
-    stop("Error: Column 'v' must contain non-negative numeric values.")
-  }
+  # Calculate value-to-weight ratio and sort items by this ratio in descending order
+  x$ratio <- x$v / x$w
+  items <- x[order(-x$ratio), ]
 
-  # Check if W is a single positive numeric value
-  if (!is.numeric(W) || length(W) != 1 || W <= 0) {
-    stop("Error: 'W' must be a single positive numeric value representing the knapsack capacity.")
-  }
+  # Initialize total value, weight, and selected indices
+  total_value <- 0
+  total_weight <- 0
+  sel_ind <- integer()
 
-  # Check for missing values in x and W
-  if (any(is.na(x$w)) || any(is.na(x$v))) {
-    stop("Error: Columns 'w' and 'v' must not contain missing values (NA).")
-  }
-
-  if (is.na(W)) {
-    stop("Error: 'W' must not be missing (NA).")
-  }
-
-  x$element <- 1:nrow(x)
-  x_filtered <- x[which(x$w <= W),]
-  x_filtered$value_per_weight <- x_filtered$v / x_filtered$w
-  x_sorted_filtered <- x_filtered[order(x_filtered$value_per_weight, decreasing = TRUE),]
-
-  w <- x_sorted_filtered$w
-  v <- x_sorted_filtered$v
-  element <- x_sorted_filtered$element
-
-  i <- 1
-  total_weight <- w[i]
-  total_value <- v[i]
-  while ((total_weight + w[i+1] <= W) & (i < nrow(x_sorted_filtered))) {
-    total_weight <- total_weight + w[i+1]
-    total_value <- total_value + v[i+1]
-    i <- i+1
-  }
-
-  if (i == nrow(x_sorted_filtered)){
-    return(list(value = total_value, elements = x_sorted_filtered$element[1:i]))
-  }
-  else if (total_value > v[i+1]) {
-    return(list(value = total_value, elements = x_sorted_filtered$element[1:i]))
+  # Loop through the sorted items and add to the knapsack
+  for (i in seq_len(nrow(items))) {
+    if (total_weight + items$w[i] <= W) {
+      total_weight <- total_weight + items$w[i]
+      total_value <- total_value + items$v[i]
+      sel_ind <- c(sel_ind, which(x$w == items$w[i] & x$v == items$v[i]))
+    } else {
+      break
     }
-  else {
-    return(list(value = v[i+1], elements = x_sorted_filtered$element[i+1]))
   }
+
+  # Return the result as a list
+  return(list(value = round(total_value), elements = sel_ind))
 }

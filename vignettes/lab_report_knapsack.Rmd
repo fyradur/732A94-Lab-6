@@ -20,40 +20,77 @@ library(Khwarizmi)
 
 # Introduction
 
-In this lab report the time for different algorithms for solving the Knapsack problem will be investigated.
+In this lab report for the course 732A94 Advanced R Programming, we will explore and evaluate the performance of different algorithms used to solve the knapsack problem, a well-known combinatorial optimization problem. Understanding the performance of these methods in handling large data sets will help in determining their efficiency in solving real-world problems.
+
+The knapsack problem involves selecting items, each with a specific weight and value, to place in a knapsack of limited capacity. The objective is to maximize the total value of the selected items without exceeding the knapsack’s weight limit. Given its NP-complete nature, the problem becomes increasingly challenging as the number of items grows, making it an ideal case for testing algorithmic performance.
 
 # Knapsack data
 
-Here we generate the data that will be used for testing the different algorithms.
+To test the efficiency of the algorithms, we first generate a synthetic dataset representing the items that can be placed in the knapsack:
 
 ```{r}
-RNGversion(min(as.character(getRversion()),"3.5.3"))
+suppressWarnings(RNGversion(min(as.character(getRversion()), "3.5.3")))
 
-##old sampler used for backward compatibility
-## suppressWarnings() can be used so that the above warning is not displayed
 set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-n <- 1000000
-knapsack_objects <-
-data.frame(
-w=sample(1:4000, size = n, replace = TRUE),
-v=runif(n = n, 0, 10000)
+n <- 2000
+knapsack_objects <- data.frame(
+  w = sample(1:4000, size = n, replace = TRUE),
+  v = runif(n = n, 0, 10000)
 )
 ```
 
-# Brute force search
+# Brute Force
+
+The brute force method is the simplest and most intuitive way to solve the knapsack problem. It involves evaluating every possible combination of items to determine the one that provides the maximum value without exceeding the weight limit. The `system.time()` function is used to measure the execution time of the brute force algorithm, and the results of this approach are shown below (for 16 objects, the value for `elapsed`).
 
 ```{r}
-system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000))
+system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16, ], W = 2000))
 ```
 
-# Dynamic programming
+# Dynamic Programming
+
+Now, we will analyze the performance of the dynamic programming algorithm, which efficiently solves the knapsack problem by breaking it down into smaller subproblems. The results of this approach are shown below (for 500 objects, the value for `elapsed`).
 
 ```{r}
-system.time(bfk <- knapsack_dynamic(x = knapsack_objects[1:500,], W = 20))
+system.time(bfk <- knapsack_dynamic(x = knapsack_objects[1:500, ], W = 2000))
 ```
 
-# Greedy heuristic
+# Greedy Heuristic
+
+The greedy heuristic approach offers a fast, although potentially suboptimal, solution by making the locally optimal choice at each step. This approach seems to be significantly faster than the other two, given that the number of object is 1000000:
 
 ```{r}
-system.time(bfk <- greedy_knapsack(x = knapsack_objects[1:1000000,], W = 2000))
+# Generate a larger data frame first
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 1000000
+knapsack_objects2 <- data.frame(
+  w = sample(1:4000, size = n, replace = TRUE),
+  v = runif(n = n, 0, 10000)
+)
+
+system.time(bfk <- greedy_knapsack(x = knapsack_objects2[1:1000000, ], W = 2000))
 ```
+
+
+## Reasons Why a Greedy Algorithm Might Yield a Better Solution
+
+The greedy algorithm can yield optimal solutions when item value-to-weight ratios align well with the knapsack's capacity. For example, selecting lightweight, high-value items results in a high total value. If items have similar weights and values, the algorithm avoids missing optimal combinations, as adding lighter items won't trigger weight limits.
+
+Despite occasionally achieving optimal solutions, the greedy algorithm remains categorized as such because it selects items based solely on the highest value-to-weight ratio, ignoring broader implications. This approach relies on making the best local choice, assuming it will lead to a global optimum, which holds true for specific structured problems. While it may not guarantee optimal solutions for all configurations, its decision-making process is inherently greedy.
+
+# Code Profiling and Optimization
+
+We've optimized the functions for better performance, especially with the brute force algorithm, which now runs nearly four times faster. Instead of generating all possible combinations, the code uses bitwise operations to determine which items to include in each combination. This approach evaluates each potential combination iteratively, which improves both memory efficiency and speed by avoiding the creation of large temporary data structures. Plus, by calculating the weight and value in one go—without keeping track of intermediate results except for the best combination—we've significantly lowered memory usage.
+
+The greedy knapsack algorithm has been improved by using the `na.omit()` function to handle NA values automatically, so there's no need for manual filtering anymore. We’ve also replaced the previous repeat loop with a for loop that uses `seq_len(nrow(items))`, which is a more standard approach in R for iterating through sequences. Now, the search for indices is based on directly matching the original weight and value, which eliminates the need for an extra index variable. It's important to mention that the performance difference isn't significant.
+
+# C++ Implementation for the Brute Force Algorithm
+
+To enhance performance, you can utilize the `fast` parameter in the rewritten `brute_force_knapsack()` function: setting it to `TRUE` employs a C++ implementation of the algorithm, while `FALSE` executes the traditional R-based approach. The results for 8 objects (notably the elapsed time) are presented below, illustrating the performance gain that is achieved with usage of C++, showing it being 0.985 seconds with the R implementation and 0.070 seconds with the C++ implementation.
+
+```{r}
+res <- system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16, ], W = 2000))
+res <- system.time(bfk <- brute_force_knapsack(x = knapsack_objects[1:16, ], W = 2000, fast = TRUE))
+```
+
+

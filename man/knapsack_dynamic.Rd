@@ -2,18 +2,26 @@
 % Please edit documentation in R/knapsack_dynamic.R
 \name{knapsack_dynamic}
 \alias{knapsack_dynamic}
-\title{Solving the knapsack problem in the case of discrete weights}
+\title{Dynamic Programming Knapsack Solver}
 \usage{
 knapsack_dynamic(x, W)
 }
 \arguments{
-\item{x}{A dataframe.}
+\item{x}{A data frame with two columns:
+\describe{
+\item{w}{A numeric vector representing the weights of the items.}
+\item{v}{A numeric vector representing the values of the items.}
+}}
 
-\item{W}{A non-negative number.}
+\item{W}{A numeric value representing the maximum weight capacity of the knapsack.}
 }
 \value{
-A list detailing the maximum value and the elements to get it.
+A list with two elements:
+\describe{
+\item{value}{The maximum total value of the items that can be carried.}
+\item{elements}{A vector of indices corresponding to the items in the optimal solution.}
+}
 }
 \description{
-Solving the knapsack problem in the case of discrete weights
+This function solves the knapsack problem using a dynamic programming approach.
 }

@@ -2,18 +2,26 @@
 % Please edit documentation in R/greedy_knapsack.R
 \name{greedy_knapsack}
 \alias{greedy_knapsack}
-\title{A heuristic solution to the knapsack problem}
+\title{Greedy Approximation Knapsack Solver}
 \usage{
 greedy_knapsack(x, W)
 }
 \arguments{
-\item{x}{A dataframe.}
+\item{x}{A data frame with two columns:
+\describe{
+\item{w}{A numeric vector representing the weights of the items.}
+\item{v}{A numeric vector representing the values of the items.}
+}}
 
-\item{W}{A non-negative number.}
+\item{W}{A numeric value representing the maximum weight capacity of the knapsack.}
 }
 \value{
-A list detailing the maximum value and the elements to get it.
+A list with two elements:
+\describe{
+\item{value}{The maximum total value of the items that can be carried.}
+\item{elements}{A vector of indices corresponding to the items selected for the optimal solution.}
+}
 }
 \description{
-A heuristic solution to the knapsack problem
+This function solves the bounded knapsack problem using a greedy approximation algorithm.
 }

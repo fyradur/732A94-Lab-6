@@ -2,18 +2,28 @@
 % Please edit documentation in R/brute_force_knapsack.R
 \name{brute_force_knapsack}
 \alias{brute_force_knapsack}
-\title{Brute force the knapsack problem}
+\title{Brute Force Knapsack Solver}
 \usage{
-brute_force_knapsack(x, W)
+brute_force_knapsack(x, W, fast = FALSE)
 }
 \arguments{
-\item{x}{A dataframe.}
+\item{x}{A data frame with two columns:
+\describe{
+\item{w}{A numeric vector representing the weights of the items.}
+\item{v}{A numeric vector representing the values of the items.}
+}}
 
-\item{W}{A non-negative number.}
+\item{W}{A numeric value representing the maximum weight capacity of the knapsack.}
+
+\item{fast}{A logical value indicating whether to use the fast C++ implementation. Default is FALSE.}
 }
 \value{
-A list detailing the maximum value and the elements to get it.
+A list with two elements:
+\describe{
+\item{value}{The maximum total value of the items that can be carried.}
+\item{elements}{A vector of indices corresponding to the items in the optimal solution.}
+}
 }
 \description{
-Brute force the knapsack problem
+This function solves the knapsack problem using a brute-force approach.
 }
