@@ -17,68 +17,43 @@
 #'
 #' @export
 greedy_knapsack <- function(x, W) {
-  # Check if input data frame is a data frame
+  # Input validation
   if (!is.data.frame(x)) {
     stop("Input x must be a data frame.")
   }
-  
-  # Check if W is non-negative
   if (W < 0) {
     stop("Input W must be non-negative.")
   }
-  
-  # Check if input data frame has the required columns w (weights) and v (values)
   if (!all(c("w", "v") %in% names(x))) {
     stop("Data frame x must contain columns named w and v.")
   }
-  
-  # Validate that w contains non-negative numeric values
-  if (!is.numeric(x$w) || any(x$w < 0)) {
-    stop("Column w must contain non-negative numeric values.")
-  }
-  
-  # Validate that v contains non-negative numeric values
-  if (!is.numeric(x$v) || any(x$v < 0)) {
-    stop("Column v must contain non-negative numeric values.")
+  if (any(x$w < 0) || any(x$v < 0)) {
+    stop("Columns w and v must contain non-negative numeric values.")
   }
   
   # Remove NA values from the data frame for w and v
-  x <- x[!is.na(x$w) & !is.na(x$v), ]
+  x <- na.omit(x)
   
-  # Calculate value-to-weight ratio and store it with indices
-  ratios <- x$v / x$w
-  items <- data.frame(index = 1:nrow(x), weight = x$w, value = x$v, ratio = ratios)
+  # Calculate value-to-weight ratio and sort items by this ratio in descending order
+  x$ratio <- x$v / x$w
+  items <- x[order(-x$ratio), ]
   
-  # Sort items by value-to-weight ratio in descending order
-  items <- items[order(-items$ratio), ]
-  
+  # Initialize total value, weight, and selected indices
   total_value <- 0
   total_weight <- 0
-  selected_indices <- integer(0)
+  selected_indices <- integer()
   
-  i <- 1  # Initialize the index for the repeat loop
-  repeat {
-    # Break the loop if we exceed the number of items
-    if (i > nrow(items)) {
-      break
-    }
-    
-    # Check if adding the current item exceeds the weight limit
-    if (total_weight + items$weight[i] <= W) {
-      total_weight <- total_weight + items$weight[i]
-      total_value <- total_value + items$value[i]
-      selected_indices <- c(selected_indices, items$index[i])  # Store the original index
+  # Loop through the sorted items and add to the knapsack
+  for (i in seq_len(nrow(items))) {
+    if (total_weight + items$w[i] <= W) {
+      total_weight <- total_weight + items$w[i]
+      total_value <- total_value + items$v[i]
+      selected_indices <- c(selected_indices, which(x$w == items$w[i] & x$v == items$v[i]))
     } else {
-      # If it exceeds the weight limit, break without adding the last item
       break
     }
-    
-    i <- i + 1  # Increment the index
   }
   
   # Return the result as a list
-  knapsack_rezzie <- list(value = round(total_value), elements = selected_indices)
-  
-  return(knapsack_rezzie)
-  
-    }
+  list(value = round(total_value), elements = selected_indices)
+}
